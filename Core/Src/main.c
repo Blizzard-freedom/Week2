@@ -46,6 +46,11 @@ UART_HandleTypeDef huart2;
 // Button matrix save
 uint16_t ButtonMatrixState=0;
 uint32_t ButtonMatrixTimestamp =0;
+uint16_t Password = 12;
+uint16_t PasswordIN = 0;
+uint32_t SwitchState1=0;
+uint32_t SwitchState0=0;
+int count = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -99,8 +104,49 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
 	  ButtonMatrixUpdate();
+	  SwitchState0 = ButtonMatrixState;
+	  if(SwitchState0!=0 && SwitchState1==0){
+		  count+=1;
+		  if(SwitchState0==512 && count==1){
+			  PasswordIN += 1;
+		  }else if(SwitchState0==64 && count==2){
+			  PasswordIN += 1;
+		  }else if(SwitchState0==32 && count==3){
+			  PasswordIN += 1;
+		  }else if(SwitchState0==2048 && count==4){
+			  PasswordIN += 1;
+		  }else if(SwitchState0==8 && count==5){
+			  PasswordIN += 1;
+		  }else if(SwitchState0==1024 && count==6){
+			  PasswordIN += 1;
+		  }else if(SwitchState0==8 && count==7){
+			  PasswordIN += 1;
+		  }else if(SwitchState0==8 && count==8){
+			  PasswordIN += 1;
+		  }else if(SwitchState0==8 && count==9){
+			  PasswordIN += 1;
+		  }else if(SwitchState0==32 && count==10){
+			  PasswordIN += 1;
+		  }else if(SwitchState0==1024 && count==11){
+			  PasswordIN += 1;
+		  }else if(SwitchState0==1 && count==12 && PasswordIN ==11){
+			  PasswordIN += 1;
+		  }else if(SwitchState0==4096){
+			  PasswordIN = 0;
+			  count=0;
+		  }
+	  }SwitchState1= SwitchState0;
+	  if(PasswordIN==Password){
+	 		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
+	 	  }else{
+	 		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+	 	  }
+
+
+
   }
   /* USER CODE END 3 */
 }
@@ -198,7 +244,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LD2_Pin|GPIO_PIN_6, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7|GPIO_PIN_9, GPIO_PIN_SET);
@@ -215,8 +261,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LD2_Pin PA7 PA9 */
-  GPIO_InitStruct.Pin = LD2_Pin|GPIO_PIN_7|GPIO_PIN_9;
+  /*Configure GPIO pins : LD2_Pin PA6 PA7 PA9 */
+  GPIO_InitStruct.Pin = LD2_Pin|GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_9;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -256,7 +302,7 @@ uint16_t ButtonMatrixPin[8] ={GPIO_PIN_10,GPIO_PIN_3,GPIO_PIN_5,GPIO_PIN_4,GPIO_
 uint8_t ButtonMatrixRow = 0;
 void ButtonMatrixUpdate()
 {
-   if(HAL_GetTick()-ButtonMatrixTimestamp>=100){
+   if(HAL_GetTick()-ButtonMatrixTimestamp>=20){
 	   ButtonMatrixTimestamp=HAL_GetTick();
 	   int i;
 	   for(i=0;i<4;i++)
