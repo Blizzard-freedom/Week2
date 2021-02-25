@@ -139,7 +139,7 @@ int main(void)
 			  count=0;
 		  }
 	  }SwitchState1= SwitchState0;
-	  if(PasswordIN==Password){
+	  if(PasswordIN==Password && count==12){
 	 		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
 	 	  }else{
 	 		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
